@@ -52,6 +52,7 @@ def main():
     if current_availability != get_last_availability():
         for _ in range(3):
             if get_current_availability() != current_availability:
+                GPIO.cleanup()
                 return
         write_last_availability(current_availability)
         print('about to update server')
