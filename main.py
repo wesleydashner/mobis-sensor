@@ -29,9 +29,12 @@ def get_distance():
 
 
 def get_current_availability():
+    max_retries = 5
+    retries = 0
     distance = get_distance()
     print(distance)
-    if distance > config.max_distance:
+    if retries < max_retries and distance > config.max_distance:
+        retries += 1
         distance = get_distance()
     return distance > config.min_distance
 
