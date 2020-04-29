@@ -30,7 +30,10 @@ def get_distance():
 
 def get_current_availability():
     distance = get_distance()
-    return distance >= config.min_distance
+    print(distance)
+    if distance > config.max_distance:
+        distance = get_distance()
+    return distance > config.min_distance
 
 
 def get_last_availability():
@@ -48,12 +51,20 @@ def update_server(v):
 
 
 def main():
-    current_availability = get_current_availability()
+    true_pings = 0
+    false_pings = 0
+    ping_requirement = 3
+    while True:
+        if true_pings == ping_requirement or false_pings == ping_requirement:
+            break
+        if get_current_availability():
+            true_pings += 1
+            false_pings = 0
+        else:
+            false_pings += 1
+            true_pings = 0
+    current_availability = true_pings == 3
     if current_availability != get_last_availability():
-        for _ in range(3):
-            if get_current_availability() != current_availability:
-                GPIO.cleanup()
-                return
         write_last_availability(current_availability)
         print('about to update server')
         update_server(current_availability)
