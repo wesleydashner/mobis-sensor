@@ -5,6 +5,7 @@ import requests
 
 
 def get_distance():
+    GPIO.setmode(GPIO.BCM)
     GPIO.setup(config.trigger_pin, GPIO.OUT)
     GPIO.setup(config.echo_pin, GPIO.IN)
     GPIO.output(config.trigger_pin, True)
@@ -23,13 +24,13 @@ def get_distance():
     time_elapsed = stop_time - start_time
 
     distance = (time_elapsed * 34300) / 2
-
+    print(distance)
     return distance
 
 
 def get_current_availability():
     distance = get_distance()
-    return distance < config.min_distance
+    return distance >= config.min_distance
 
 
 def get_last_availability():
@@ -53,7 +54,9 @@ def main():
             if get_current_availability() != current_availability:
                 return
         write_last_availability(current_availability)
+        print('about to update server')
         update_server(current_availability)
+    GPIO.cleanup()
 
 
 main()
