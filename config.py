@@ -1,5 +1,6 @@
 sensor_id = 'a1'
 lot_id = 'j93sQbNSAKVYTkMyjt8y'
+min_min_distance = 1
 min_distance = 200
 max_distance = 500
 trigger_pin = 14

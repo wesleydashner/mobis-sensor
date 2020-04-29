@@ -12,15 +12,17 @@ def get_distance():
     time.sleep(0.00001)
     GPIO.output(config.trigger_pin, False)
 
+    original_time = time.time()
     start_time = time.time()
     stop_time = time.time()
 
-    while GPIO.input(config.echo_pin) == 0:
+    while GPIO.input(config.echo_pin) == 0 and time.time() - original_time < 0.1:
         start_time = time.time()
 
-    while GPIO.input(config.echo_pin) == 1:
+    while GPIO.input(config.echo_pin) == 1 and time.time() - original_time < 0.1:
         stop_time = time.time()
 
+    time.sleep(0.00001)
     time_elapsed = stop_time - start_time
 
     distance = (time_elapsed * 34300) / 2
@@ -32,8 +34,7 @@ def get_current_availability():
     max_retries = 5
     retries = 0
     distance = get_distance()
-    print(distance)
-    if retries < max_retries and distance > config.max_distance:
+    while retries < max_retries and (distance > config.max_distance or distance < config.min_min_distance):
         retries += 1
         distance = get_distance()
     return distance > config.min_distance
@@ -68,9 +69,9 @@ def main():
             true_pings = 0
     current_availability = true_pings == 3
     if current_availability != get_last_availability():
-        write_last_availability(current_availability)
         print('about to update server')
         update_server(current_availability)
+        write_last_availability(current_availability)
     GPIO.cleanup()
 
 
